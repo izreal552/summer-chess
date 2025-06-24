@@ -40,4 +40,24 @@ public class MoveCalculator {
         return moves;
     }
 
+    static HashSet<ChessMove> singleMovmement(ChessBoard board, ChessPosition position, int[][] possibleMoves,
+                                                   int yPos, int xPos, ChessGame.TeamColor team) {
+    HashSet<ChessMove> moves = new HashSet<>();
+    for(int[] direction:possibleMoves){
+        ChessPosition newPosition = new ChessPosition(yPos + direction[1], xPos + direction[0]);
+
+        if(isValid(newPosition)){
+            //check if there is a piece at new location
+            if(board.getPiece(newPosition) == null){
+                moves.add(new ChessMove(position, newPosition, null));
+            }
+            //check if captured piece
+            else if (board.getPiece(newPosition).getTeamColor() != team) {
+                moves.add(new ChessMove(position, newPosition, null));
+            }
+        }
+    }
+    return moves;
+    }
+
 }
