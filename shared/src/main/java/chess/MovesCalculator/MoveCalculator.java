@@ -19,11 +19,23 @@ public class MoveCalculator {
             while(!blocked){
                 ChessPosition newPosition = new ChessPosition(yPos + direction[1]*i, xPos + direction[0]*i);
                 //check if on board
-                //check if there is movement
+                if(!isValid(newPosition)){
+                    blocked = true;
+                }
+                //check if there is a piece at new location
+                else if (board.getPiece(newPosition) == null){
+                    moves.add(new ChessMove(position, newPosition,null));
+                }
                 //check if captured piece
+                else if (board.getPiece(newPosition).getTeamColor() != team){
+                    moves.add(new ChessMove(position, newPosition, null));
+                }
                 //check if blocked by own piece
+                else if (board.getPiece(newPosition).getTeamColor() == team){
+                    blocked = true;
+                }
+                i++;
             }
-            i++;
         }
         return moves;
     }
