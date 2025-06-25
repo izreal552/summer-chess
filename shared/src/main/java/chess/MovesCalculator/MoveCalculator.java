@@ -29,6 +29,7 @@ public class MoveCalculator {
                 //check if captured piece
                 else if (board.getPiece(newPosition).getTeamColor() != team){
                     moves.add(new ChessMove(position, newPosition, null));
+                    blocked = true;
                 }
                 //check if blocked by own piece
                 else if (board.getPiece(newPosition).getTeamColor() == team){
