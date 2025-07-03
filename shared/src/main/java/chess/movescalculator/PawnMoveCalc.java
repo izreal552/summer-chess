@@ -35,7 +35,7 @@ public class PawnMoveCalc {
 
         for(ChessPiece.PieceType promotion: promotionPiece){
             //derermine capture cases
-            ChessPosition forwardProsition = new ChessPosition(yPos + moveForward, xPos);
+            ChessPosition forwardPosition = new ChessPosition(yPos + moveForward, xPos);
             ChessPosition doubleForward = new ChessPosition(yPos + moveForward * 2, xPos);
             ChessPosition rightCapture = new ChessPosition(yPos + moveForward, xPos + 1);
             ChessPosition leftCapture = new ChessPosition(yPos + moveForward, xPos - 1);
@@ -43,13 +43,13 @@ public class PawnMoveCalc {
 
             if(MoveCalculator.isValid(doubleForward) &&
                     (start) &&
-                    (board.getPiece(forwardProsition) == null) &&
+                    (board.getPiece(forwardPosition) == null) &&
                     (board.getPiece(doubleForward) == null)){
                 moves.add(new ChessMove(pos, doubleForward, promotion));
             }
-            if(MoveCalculator.isValid(forwardProsition) &&
-                    (board.getPiece(forwardProsition) == null)){
-                moves.add(new ChessMove(pos, forwardProsition, promotion));
+            if(MoveCalculator.isValid(forwardPosition) &&
+                    (board.getPiece(forwardPosition) == null)){
+                moves.add(new ChessMove(pos, forwardPosition, promotion));
             }
             if(MoveCalculator.isValid(rightCapture) &&
                     (board.getPiece(rightCapture) != null) &&

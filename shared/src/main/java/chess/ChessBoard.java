@@ -9,7 +9,7 @@ import java.util.Objects;
  * Note: You can add to this class, but you may not alter
  * signature of the existing methods.
  */
-public class ChessBoard {
+public class    ChessBoard {
 
     private ChessPiece[][] board;
 
@@ -36,6 +36,7 @@ public class ChessBoard {
      * position
      */
     public ChessPiece getPiece(ChessPosition position) {
+
         return board[position.getRow() -1][position.getColumn() -1];
     }
 
