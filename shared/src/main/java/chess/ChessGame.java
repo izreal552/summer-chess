@@ -103,7 +103,7 @@ public class ChessGame {
 
         Collection<ChessMove> movement = validMoves(startPosition);
         boolean isValidMovement = movement.contains(move);
-        if(movement == null || !isValidMovement){
+        if(!isValidMovement){
             throw new InvalidMoveException("No valid moves");
         }
 
