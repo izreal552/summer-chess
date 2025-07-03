@@ -12,7 +12,7 @@ import java.util.Objects;
  */
 public class ChessGame {
 
-    private TeamColor teamColor;
+    private TeamColor teamTurn;
     private ChessBoard board;
 
     public ChessGame() {
@@ -26,7 +26,7 @@ public class ChessGame {
      */
     public TeamColor getTeamTurn() {
 
-        return teamColor;
+        return teamTurn;
     }
 
     /**
@@ -36,7 +36,7 @@ public class ChessGame {
      */
     public void setTeamTurn(TeamColor team) {
 
-        teamColor = team;
+        teamTurn = team;
     }
 
     /**
@@ -204,7 +204,28 @@ public class ChessGame {
      * @return True if the specified team is in stalemate, otherwise false
      */
     public boolean isInStalemate(TeamColor teamColor) {
-        throw new RuntimeException("Not implemented");
+        if(teamTurn != teamColor){
+            return false;
+        }
+        if(isInCheck(teamColor)){
+            return false;
+        }
+        for(int row = 1; row <= 8; row++){
+            for(int col = 1; col <= 8; col++){
+                ChessPosition pos = new ChessPosition(row,col);
+                ChessPiece piece = board.getPiece(pos);
+                Collection<ChessMove> moves;
+
+                if(piece != null && teamColor == piece.getTeamColor()){
+                    moves = validMoves(pos);
+                    if(moves != null && !moves.isEmpty()){
+                        return false;
+                    }
+                }
+
+            }
+        }
+        return true;
     }
 
     /**
@@ -231,18 +252,18 @@ public class ChessGame {
             return false;
         }
         ChessGame chessGame = (ChessGame) o;
-        return teamColor == chessGame.teamColor && Objects.equals(board, chessGame.board);
+        return teamTurn == chessGame.teamTurn && Objects.equals(board, chessGame.board);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(teamColor, board);
+        return Objects.hash(teamTurn, board);
     }
 
     @Override
     public String toString() {
         return "ChessGame{" +
-                "teamColor=" + teamColor +
+                "teamColor=" + teamTurn +
                 ", board=" + board +
                 '}';
     }
