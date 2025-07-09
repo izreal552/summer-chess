@@ -56,9 +56,9 @@ public class GameService {
         } catch (DataAccessException e) {
             String msg = e.getMessage();
             if (msg != null && msg.contains("Auth")) {
-                throw new UnauthorizedUserException("auth");
+                throw new UnauthorizedException("auth");
             }
-            throw new UnauthorizedUserException("invalid");
+            throw new UnauthorizedException("invalid");
         }
 
         try {
@@ -106,8 +106,8 @@ public class GameService {
             authDAO.getAuth(authToken);
         } catch (DataAccessException e) {
             String msg = e.getMessage() != null ? e.getMessage().toLowerCase() : "";
-            if (msg.contains("failed")) throw new UnauthorizedUserException("failed");
-            throw new UnauthorizedUserException("invalid");
+            if (msg.contains("failed")) throw new UnauthorizedException("failed");
+            throw new UnauthorizedException("invalid");
         }
     }
 
