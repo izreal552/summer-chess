@@ -5,7 +5,7 @@ import model.AuthData;
 import java.util.HashMap;
 import java.util.Map;
 
-public class MemoryAuthDAO implements AuthInterface {
+public class MemoryAuthDAO implements AuthDAO {
 
     private Map<String, AuthData> db;
 

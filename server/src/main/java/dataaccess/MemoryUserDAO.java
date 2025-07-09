@@ -5,7 +5,7 @@ import model.UserData;
 import java.util.HashMap;
 import java.util.Map;
 
-public class MemoryUserDAO implements UserInterface {
+public class MemoryUserDAO implements UserDAO {
 
     private Map<String, UserData> db;
 
