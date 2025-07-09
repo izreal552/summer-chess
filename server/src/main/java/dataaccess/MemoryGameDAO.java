@@ -7,12 +7,12 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 
-public class MemoryGameDAO implements GaneInterface {
+public class MemoryGameDAO implements GameInterface {
 
     private Map<Integer, GameData> db;
 
     public MemoryGameDAO() {
-        db = new HashMap<>(16);
+        db = new HashMap<>();
     }
 
     @Override

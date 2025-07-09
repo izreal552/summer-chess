@@ -5,7 +5,7 @@ import model.GameData;
 
 import java.util.HashSet;
 
-public interface GaneInterface {
+public interface GameInterface {
     HashSet<GameData> listGames()       throws DataAccessException;
     void createGame(GameData game)      throws DataAccessException;
     void createGame(int gameID, String whiteUsername, String blackUsername, String gameName, ChessGame game);
