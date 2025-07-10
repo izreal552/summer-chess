@@ -30,7 +30,7 @@ public class DatabaseManager {
         }
     }
 
-    public static void initializeDatabas() throws DataAccessException{
+    public static void initializeDatabase() throws DataAccessException{
         if(!initialized){
             createDatabase();
             initialized = true;
