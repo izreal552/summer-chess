@@ -8,6 +8,7 @@ public class DatabaseManager {
     private static String dbUsername;
     private static String dbPassword;
     private static String connectionUrl;
+    private static boolean initialized = false;
 
     /*
      * Load the database information for the db.properties file.
@@ -29,6 +30,13 @@ public class DatabaseManager {
         }
     }
 
+    public static void initializeDatabas() throws DataAccessException{
+        if(!initialized){
+            createDatabase();
+            initialized = true;
+        }
+    }
+
     /**
      * Create a connection to the database and sets the catalog based upon the
      * properties specified in db.properties. Connections to the database should
@@ -43,6 +51,7 @@ public class DatabaseManager {
      */
     static Connection getConnection() throws DataAccessException {
         try {
+            initializeDatabas();
             //do not wrap the following line with a try-with-resources
             var conn = DriverManager.getConnection(connectionUrl, dbUsername, dbPassword);
             conn.setCatalog(databaseName);
