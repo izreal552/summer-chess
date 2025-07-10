@@ -106,7 +106,9 @@ public class GameService {
             authDAO.getAuth(authToken);
         } catch (DataAccessException e) {
             String msg = e.getMessage() != null ? e.getMessage().toLowerCase() : "";
-            if (msg.contains("failed")) throw new UnauthorizedException("failed");
+            if (msg.contains("failed")) {
+                throw new UnauthorizedException("failed");
+            }
             throw new UnauthorizedException("invalid");
         }
     }
