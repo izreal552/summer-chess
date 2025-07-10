@@ -58,7 +58,7 @@ public class UserHandler {
             resp.status(400);
             return "{ \"message\": \"Error: Invalid request format\" }";
         } catch (DataAccessException e) {
-            if (e.getMessage().contains("Invalid credentials") || e.getMessage().contains("User not found")) {
+            if (e.getMessage().contains("Invalid credentials") || e.getMessage().contains("does not exist")) {
                 resp.status(401);
                 return "{ \"message\": \"Error: Unauthorized\" }";
             } else {

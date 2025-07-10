@@ -7,7 +7,7 @@ import java.util.Map;
 
 public class MemoryAuthDAO implements AuthDAO {
 
-    private Map<String, AuthData> db;
+    private final Map<String, AuthData> db;
 
     public MemoryAuthDAO() {
         db = new HashMap<>();
@@ -29,14 +29,14 @@ public class MemoryAuthDAO implements AuthDAO {
 
     @Override
     public void delAuth(String authToken) {
-        db.remove(authToken);
+        db.remove(String.valueOf(authToken));
     }
 
     @Override
     public AuthData getAuth(String authToken) throws DataAccessException {
         AuthData authData = db.get(authToken);
         if (authData == null) {
-            throw new DataAccessException("Auth Token '" + authToken + "' does not exist");
+            throw new UnauthorizedException("Auth Token '" + authToken + "' does not exist");
         }
         return authData;
     }
