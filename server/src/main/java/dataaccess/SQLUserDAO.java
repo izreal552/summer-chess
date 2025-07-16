@@ -19,12 +19,10 @@ public class SQLUserDAO implements UserDAO {
 
     @Override
     public void createUser(String username, String password, String email) throws DataAccessException {
-        String hashedPassword = hashPassword(password);
-
-        String insertSQL = "INSERT INTO user (username, password, email) VALUES (?, ?, ?)";
-
+        String hashedPassword = BCrypt.hashpw(password, BCrypt.gensalt());
+        String query = "INSERT INTO user (username, password, email) VALUES (?, ?, ?)";
         try (Connection conn = DatabaseManager.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(insertSQL)) {
+             PreparedStatement stmt = conn.prepareStatement(query)) {
             stmt.setString(1, username);
             stmt.setString(2, hashedPassword);
             stmt.setString(3, email);
@@ -39,23 +37,20 @@ public class SQLUserDAO implements UserDAO {
 
     @Override
     public UserData getUser(String username) throws DataAccessException {
-        String query = "SELECT username, password, email FROM user WHERE username = ?";
-
-        try (Connection conn = DatabaseManager.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(query)) {
-
-            stmt.setString(1, username);
-
-            try (var rs = stmt.executeQuery()) {
-                if (rs.next()) {
-                    String password = rs.getString("password");
-                    String email = rs.getString("email");
-                    return new UserData(username, password, email);
-                } else {
-                    throw new DataAccessException("User not found: " + username);
+        try (var conn = DatabaseManager.getConnection()) {
+            var stmt = "SELECT username, password, email FROM user WHERE username = ?";
+            try (var ps = conn.prepareStatement(stmt)) {
+                ps.setString(1, username);
+                try (var rs = ps.executeQuery()) {
+                    if (rs.next()) {
+                        String password = rs.getString("password");
+                        String email = rs.getString("email");
+                        return new UserData(username, password, email);
+                    } else {
+                        throw new DataAccessException("User not found: " + username);
+                    }
                 }
             }
-
         } catch (SQLException e) {
             throw new DataAccessException("Error retrieving user: " + e.getMessage());
         }
@@ -64,7 +59,7 @@ public class SQLUserDAO implements UserDAO {
     @Override
     public boolean authUser(String username, String password) throws DataAccessException {
         UserData user = getUser(username);
-        return passwordMatching(password, user.password());
+        return BCrypt.checkpw(password, user.password());
     }
 
     @Override
@@ -85,14 +80,6 @@ public class SQLUserDAO implements UserDAO {
             PRIMARY KEY (username)
         )
     """;
-
-    public static String hashPassword(String password) {
-        return BCrypt.hashpw(password, BCrypt.gensalt());
-    }
-
-    public static boolean passwordMatching(String rawPassword, String hashedPassword) {
-        return BCrypt.checkpw(rawPassword, hashedPassword);
-    }
 
     private void initializeDatabase() {
         try {
