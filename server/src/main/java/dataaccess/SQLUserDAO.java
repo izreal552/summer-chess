@@ -72,8 +72,8 @@ public class SQLUserDAO implements UserDAO {
         try (Connection conn = DatabaseManager.getConnection();
              PreparedStatement stmt = conn.prepareStatement("TRUNCATE user")) {
             stmt.executeUpdate();
-        } catch (SQLException | DataAccessException e) {
-            throw new RuntimeException("Failed to clear user table", e);
+        } catch (SQLException | DataAccessException exception) {
+            throw new RuntimeException("Failed to clear user table", exception);
         }
     }
 
@@ -97,15 +97,15 @@ public class SQLUserDAO implements UserDAO {
     private void initializeDatabase() {
         try {
             DatabaseManager.createDatabase();
-        } catch (DataAccessException ex) {
-            throw new RuntimeException("Failed to initialize database", ex);
+        } catch (DataAccessException exception) {
+            throw new RuntimeException("Failed to initialize database", exception);
         }
 
         try (Connection conn = DatabaseManager.getConnection();
              PreparedStatement stmt = conn.prepareStatement(CREATE_TABLE_SQL)) {
             stmt.executeUpdate();
-        } catch (SQLException | DataAccessException e) {
-            throw new RuntimeException("Failed to create user table", e);
+        } catch (SQLException | DataAccessException exception) {
+            throw new RuntimeException("Failed to create user table", exception);
         }
     }
 }
