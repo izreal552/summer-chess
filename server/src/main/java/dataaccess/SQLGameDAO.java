@@ -12,7 +12,7 @@ public class SQLGameDAO implements GameDAO {
         initializeDatabase();
     }
 
-    private static final Gson gson = new Gson();
+    private static final Gson GSON = new Gson();
 
     @Override
     public HashSet<GameData> listGames() throws DataAccessException {
@@ -46,7 +46,7 @@ public class SQLGameDAO implements GameDAO {
                 ps.setString(2, whiteUsername);
                 ps.setString(3, blackUsername);
                 ps.setString(4, gameName);
-                ps.setString(5, gson.toJson(game)); //serialize game
+                ps.setString(5, GSON.toJson(game)); //serialize game
                 ps.executeUpdate();
             }
         } catch (SQLException | DataAccessException e) {
@@ -65,7 +65,7 @@ public class SQLGameDAO implements GameDAO {
                     var whiteUsername = rs.getString("whiteUsername");
                     var blackUsername = rs.getString("blackUsername");
                     var gameName = rs.getString("gameName");
-                    var chessGame = gson.fromJson(rs.getString("chessGame"), ChessGame.class); //deserialize game
+                    var chessGame = GSON.fromJson(rs.getString("chessGame"), ChessGame.class); //deserialize game
                     return new GameData(gameID, whiteUsername, blackUsername, gameName, chessGame);
                 }
             }
@@ -97,7 +97,7 @@ public class SQLGameDAO implements GameDAO {
                 ps.setString(1, game.whiteUsername());
                 ps.setString(2, game.blackUsername());
                 ps.setString(3, game.gameName());
-                ps.setString(4, gson.toJson(game.game())); // Serialize
+                ps.setString(4, GSON.toJson(game.game())); // Serialize
                 ps.setInt(5, game.gameID());
 
                 int rows = ps.executeUpdate();
@@ -127,7 +127,7 @@ public class SQLGameDAO implements GameDAO {
         String whiteUsername = rs.getString("whiteUsername");
         String blackUsername = rs.getString("blackUsername");
         String gameName = rs.getString("gameName");
-        ChessGame game = gson.fromJson(rs.getString("chessGame"), ChessGame.class); //deserialize game
+        ChessGame game = GSON.fromJson(rs.getString("chessGame"), ChessGame.class); //deserialize game
         return new GameData(gameID, whiteUsername, blackUsername, gameName, game);
     }
 
