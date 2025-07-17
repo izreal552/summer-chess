@@ -82,13 +82,13 @@ public class SQLAuthDAO implements AuthDAO{
         }
     }
 
-    private static final String CREATE_TABLE_SQL = """
-        CREATE TABLE IF NOT EXISTS user (
+    private final String[] CREATE_TABLE_SQL = {"""
+        CREATE TABLE IF NOT EXISTS auth (
             username VARCHAR(255) NOT NULL,
             authToken VARCHAR(255) NOT NULL,
             PRIMARY KEY (authToken)
         )
-    """;
+    """};
 
     private void initializeDatabase() {
         try {
@@ -97,9 +97,11 @@ public class SQLAuthDAO implements AuthDAO{
             throw new RuntimeException("Failed to initialize database", exception);
         }
 
-        try (var conn = DatabaseManager.getConnection()){
-            try (var stmt = conn.prepareStatement(CREATE_TABLE_SQL)) {
-                stmt.executeUpdate();
+        try (var conn = DatabaseManager.getConnection()) {
+            for (var statement : CREATE_TABLE_SQL) {
+                try (var preparedStatement = conn.prepareStatement(statement)) {
+                    preparedStatement.executeUpdate();
+                }
             }
         }catch (SQLException | DataAccessException exception) {
             throw new RuntimeException("Failed to create auth table", exception);

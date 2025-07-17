@@ -131,7 +131,7 @@ public class SQLGameDAO implements GameDAO {
         return new GameData(gameID, whiteUsername, blackUsername, gameName, game);
     }
 
-    private static final String CREATE_TABLE_SQL = """
+    private final String[] CREATE_TABLE_SQL = {"""
         CREATE TABLE IF NOT EXISTS game (
             gameID INT NOT NULL,
             whiteUsername VARCHAR(255),
@@ -140,7 +140,7 @@ public class SQLGameDAO implements GameDAO {
             chessGame TEXT,
             PRIMARY KEY (gameID)
         )
-    """;
+    """};
 
 
 
@@ -150,10 +150,11 @@ public class SQLGameDAO implements GameDAO {
         } catch (DataAccessException exception) {
             throw new RuntimeException("Failed to initialize database", exception);
         }
-
-        try (var conn = DatabaseManager.getConnection()){
-            try (var stmt = conn.prepareStatement(CREATE_TABLE_SQL)) {
-                stmt.executeUpdate();
+        try (var conn = DatabaseManager.getConnection()) {
+            for (var statement : CREATE_TABLE_SQL) {
+                try (var preparedStatement = conn.prepareStatement(statement)) {
+                    preparedStatement.executeUpdate();
+                }
             }
         }catch (SQLException | DataAccessException exception) {
             throw new RuntimeException("Failed to create game table", exception);

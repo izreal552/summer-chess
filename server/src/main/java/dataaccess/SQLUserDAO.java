@@ -68,14 +68,14 @@ public class SQLUserDAO implements UserDAO {
         }
     }
 
-    private static final String CREATE_TABLE_SQL = """
+    private final String[] CREATE_TABLE_SQL = {"""
         CREATE TABLE IF NOT EXISTS user (
             username VARCHAR(255) NOT NULL,
             password VARCHAR(255) NOT NULL,
             email VARCHAR(255),
             PRIMARY KEY (username)
         )
-    """;
+    """};
 
     private void initializeDatabase(){
         try {
@@ -84,10 +84,12 @@ public class SQLUserDAO implements UserDAO {
             throw new RuntimeException("Failed to initialize database", exception);
         }
 
-        try (var conn = DatabaseManager.getConnection()){
-             try (var stmt = conn.prepareStatement(CREATE_TABLE_SQL)) {
-                 stmt.executeUpdate();
-             }
+        try (var conn = DatabaseManager.getConnection()) {
+            for (var statement : CREATE_TABLE_SQL) {
+                try (var preparedStatement = conn.prepareStatement(statement)) {
+                    preparedStatement.executeUpdate();
+                }
+            }
         }catch (SQLException | DataAccessException exception) {
             throw new RuntimeException("Failed to create user table", exception);
         }
