@@ -25,10 +25,7 @@ public class SQLUserDAO implements UserDAO {
             stmt.setString(3, email);
             stmt.executeUpdate();
         } catch (SQLException e) {
-            if (e.getMessage().contains("Duplicate entry")) {
-                throw new DataAccessException("Username already taken");
-            }
-            throw new DataAccessException("Failed to create user: " + e.getMessage());
+            throw new DataAccessException("User already exists: " + username);
         }
     }
 
