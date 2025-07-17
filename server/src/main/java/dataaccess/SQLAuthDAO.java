@@ -82,7 +82,7 @@ public class SQLAuthDAO implements AuthDAO{
         }
     }
 
-    private final String[] CREATE_TABLE_SQL = {"""
+    private final String[] tableStatement = {"""
         CREATE TABLE IF NOT EXISTS auth (
             username VARCHAR(255) NOT NULL,
             authToken VARCHAR(255) NOT NULL,
@@ -98,7 +98,7 @@ public class SQLAuthDAO implements AuthDAO{
         }
 
         try (var conn = DatabaseManager.getConnection()) {
-            for (var statement : CREATE_TABLE_SQL) {
+            for (var statement : tableStatement) {
                 try (var preparedStatement = conn.prepareStatement(statement)) {
                     preparedStatement.executeUpdate();
                 }

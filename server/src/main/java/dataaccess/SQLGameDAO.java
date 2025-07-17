@@ -131,7 +131,7 @@ public class SQLGameDAO implements GameDAO {
         return new GameData(gameID, whiteUsername, blackUsername, gameName, game);
     }
 
-    private final String[] CREATE_TABLE_SQL = {"""
+    private final String[] tableStatement = {"""
         CREATE TABLE IF NOT EXISTS game (
             gameID INT NOT NULL,
             whiteUsername VARCHAR(255),
@@ -151,7 +151,7 @@ public class SQLGameDAO implements GameDAO {
             throw new RuntimeException("Failed to initialize database", exception);
         }
         try (var conn = DatabaseManager.getConnection()) {
-            for (var statement : CREATE_TABLE_SQL) {
+            for (var statement : tableStatement) {
                 try (var preparedStatement = conn.prepareStatement(statement)) {
                     preparedStatement.executeUpdate();
                 }
