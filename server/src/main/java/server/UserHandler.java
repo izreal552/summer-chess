@@ -12,7 +12,6 @@ import spark.Response;
 
 public class UserHandler {
     UserService userService;
-
     public UserHandler(UserService userService) {
         this.userService = userService;
     }
