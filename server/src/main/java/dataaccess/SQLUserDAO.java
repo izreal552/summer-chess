@@ -21,7 +21,7 @@ public class SQLUserDAO implements UserDAO {
     public void createUser(String username, String password, String email) throws DataAccessException {
         String hashedPassword = BCrypt.hashpw(password, BCrypt.gensalt());
         String query = "INSERT INTO user (username, password, email) VALUES (?, ?, ?)";
-        try (Connection conn = DatabaseManager.getConnection();
+        try (var conn = DatabaseManager.getConnection();
              PreparedStatement stmt = conn.prepareStatement(query)) {
             stmt.setString(1, username);
             stmt.setString(2, hashedPassword);
@@ -64,7 +64,7 @@ public class SQLUserDAO implements UserDAO {
 
     @Override
     public void clear() {
-        try (Connection conn = DatabaseManager.getConnection();
+        try (var conn = DatabaseManager.getConnection();
              PreparedStatement stmt = conn.prepareStatement("TRUNCATE user")) {
             stmt.executeUpdate();
         } catch (SQLException | DataAccessException exception) {
@@ -88,7 +88,7 @@ public class SQLUserDAO implements UserDAO {
             throw new RuntimeException("Failed to initialize database", exception);
         }
 
-        try (Connection conn = DatabaseManager.getConnection();
+        try (var conn = DatabaseManager.getConnection();
              PreparedStatement stmt = conn.prepareStatement(CREATE_TABLE_SQL)) {
             stmt.executeUpdate();
         } catch (SQLException | DataAccessException exception) {

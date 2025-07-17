@@ -18,21 +18,18 @@ public class SQLGameDAO implements GameDAO {
     @Override
     public HashSet<GameData> listGames() throws DataAccessException {
         HashSet<GameData> games = new HashSet<>();
-
-        String query = "SELECT gameID, whiteUsername, blackUsername, gameName, chessGame FROM game";
-
-        try (Connection conn = DatabaseManager.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(query);
-             ResultSet results = stmt.executeQuery()) {
-
-            while (results.next()) {
-                games.add(extractGameData(results));
+        try (var conn = DatabaseManager.getConnection()){
+            var stmt = "SELECT gameID, whiteUsername, blackUsername, gameName, chessGame FROM game";
+            try (var ps = conn.prepareStatement(stmt)){
+                try (var rs = ps.executeQuery()){
+                    while (rs.next()) {
+                        games.add(extractGameData(rs));
+                    }
+                }
             }
-
-        } catch (SQLException e) {
-            throw new DataAccessException("Failed to list games: " + e.getMessage(), e);
+        }catch (SQLException e) {
+                throw new DataAccessException("Failed to list games: " + e.getMessage(), e);
         }
-
         return games;
     }
 
@@ -44,15 +41,14 @@ public class SQLGameDAO implements GameDAO {
     @Override
     public void createGame(int gameID, String whiteUsername, String blackUsername, String gameName, ChessGame game) {
         String insert = "INSERT INTO game (gameID, whiteUsername, blackUsername, gameName, chessGame) VALUES (?, ?, ?, ?, ?)";
-
-        try (Connection conn = DatabaseManager.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(insert)) {
+        try (var conn = DatabaseManager.getConnection();
+             var stmt = conn.prepareStatement(insert)) {
 
             stmt.setInt(1, gameID);
             stmt.setString(2, whiteUsername);
             stmt.setString(3, blackUsername);
             stmt.setString(4, gameName);
-            stmt.setString(5, serializeGame(game));
+            stmt.setString(5, gson.toJson(game)); //serialize game
             stmt.executeUpdate();
 
         } catch (SQLException | DataAccessException e) {
@@ -64,8 +60,8 @@ public class SQLGameDAO implements GameDAO {
     public GameData getGame(int gameID) throws DataAccessException {
         String query = "SELECT whiteUsername, blackUsername, gameName, chessGame FROM game WHERE gameID = ?";
 
-        try (Connection conn = DatabaseManager.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(query)) {
+        try (var conn = DatabaseManager.getConnection();
+             var stmt = conn.prepareStatement(query)) {
 
             stmt.setInt(1, gameID);
             try (ResultSet rs = stmt.executeQuery()) {
@@ -75,7 +71,7 @@ public class SQLGameDAO implements GameDAO {
                             rs.getString("whiteUsername"),
                             rs.getString("blackUsername"),
                             rs.getString("gameName"),
-                            deserializeGame(rs.getString("chessGame"))
+                            gson.fromJson(rs.getString("chessGame"), ChessGame.class) //deserialize game
                     );
                 } else {
                     throw new DataAccessException("Game not found with ID: " + gameID);
@@ -90,15 +86,12 @@ public class SQLGameDAO implements GameDAO {
     @Override
     public boolean gameExists(int gameID) {
         String query = "SELECT gameID FROM game WHERE gameID = ?";
-
-        try (Connection conn = DatabaseManager.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(query)) {
-
+        try (var conn = DatabaseManager.getConnection();
+             var stmt = conn.prepareStatement(query)) {
             stmt.setInt(1, gameID);
             try (ResultSet rs = stmt.executeQuery()) {
                 return rs.next();
             }
-
         } catch (SQLException | DataAccessException e) {
             return false;
         }
@@ -108,13 +101,13 @@ public class SQLGameDAO implements GameDAO {
     public void updateGame(GameData game) throws DataAccessException {
         String update = "UPDATE game SET whiteUsername = ?, blackUsername = ?, gameName = ?, chessGame = ? WHERE gameID = ?";
 
-        try (Connection conn = DatabaseManager.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(update)) {
+        try (var conn = DatabaseManager.getConnection();
+             var stmt = conn.prepareStatement(update)) {
 
             stmt.setString(1, game.whiteUsername());
             stmt.setString(2, game.blackUsername());
             stmt.setString(3, game.gameName());
-            stmt.setString(4, serializeGame(game.game()));
+            stmt.setString(4, gson.toJson(game.game())); //serialize
             stmt.setInt(5, game.gameID());
 
             int rows = stmt.executeUpdate();
@@ -129,8 +122,8 @@ public class SQLGameDAO implements GameDAO {
 
     @Override
     public void clear() {
-        try (Connection conn = DatabaseManager.getConnection();
-             PreparedStatement stmt = conn.prepareStatement("TRUNCATE game")) {
+        try (var conn = DatabaseManager.getConnection();
+             var stmt = conn.prepareStatement("TRUNCATE game")) {
             stmt.executeUpdate();
         } catch (SQLException | DataAccessException exception) {
             throw new RuntimeException("Failed to clear game table", exception);
@@ -142,16 +135,8 @@ public class SQLGameDAO implements GameDAO {
         String whiteUsername = rs.getString("whiteUsername");
         String blackUsername = rs.getString("blackUsername");
         String gameName = rs.getString("gameName");
-        ChessGame game = deserializeGame(rs.getString("chessGame"));
+        ChessGame game = gson.fromJson(rs.getString("chessGame"), ChessGame.class); //deserialize game
         return new GameData(gameID, whiteUsername, blackUsername, gameName, game);
-    }
-
-    private String serializeGame(ChessGame game) {
-        return gson.toJson(game);
-    }
-
-    private ChessGame deserializeGame(String json) {
-        return gson.fromJson(json, ChessGame.class);
     }
 
     private static final String CREATE_TABLE_SQL = """
@@ -174,8 +159,8 @@ public class SQLGameDAO implements GameDAO {
             throw new RuntimeException("Failed to create database", e);
         }
 
-        try (Connection conn = DatabaseManager.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(CREATE_TABLE_SQL)) {
+        try (var conn = DatabaseManager.getConnection();
+             var stmt = conn.prepareStatement(CREATE_TABLE_SQL)) {
             stmt.executeUpdate();
         } catch (SQLException | DataAccessException e) {
             throw new RuntimeException("Failed to create game table", e);
