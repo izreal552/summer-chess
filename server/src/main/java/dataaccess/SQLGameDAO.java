@@ -8,7 +8,7 @@ import java.sql.*;
 import java.util.HashSet;
 
 public class SQLGameDAO implements GameDAO {
-    public SQLGameDAO() throws DataAccessException {
+    public SQLGameDAO(){
         initializeDatabase();
     }
 
@@ -144,14 +144,19 @@ public class SQLGameDAO implements GameDAO {
 
 
 
-    private void initializeDatabase() throws DataAccessException{
-        DatabaseManager.createDatabase();
-        try (var conn = DatabaseManager.getConnection()) {
-            try (var ps = conn.prepareStatement(CREATE_TABLE_SQL)) {
-                ps.executeUpdate();
+    private void initializeDatabase(){
+        try {
+            DatabaseManager.createDatabase();
+        } catch (DataAccessException exception) {
+            throw new RuntimeException("Failed to initialize database", exception);
+        }
+
+        try (var conn = DatabaseManager.getConnection()){
+            try (var stmt = conn.prepareStatement(CREATE_TABLE_SQL)) {
+                stmt.executeUpdate();
             }
-        } catch (SQLException e) {
-            throw new DataAccessException("Failed to create game table: " + e.getMessage(), e);
+        }catch (SQLException | DataAccessException exception) {
+            throw new RuntimeException("Failed to create game table", exception);
         }
     }
 

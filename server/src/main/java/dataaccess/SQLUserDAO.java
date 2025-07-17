@@ -8,7 +8,7 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 public class SQLUserDAO implements UserDAO {
-    public SQLUserDAO() throws DataAccessException {
+    public SQLUserDAO(){
         initializeDatabase();
     }
 
@@ -82,14 +82,19 @@ public class SQLUserDAO implements UserDAO {
         )
     """;
 
-    private void initializeDatabase() throws DataAccessException {
-        DatabaseManager.createDatabase();
-        try (var conn = DatabaseManager.getConnection()) {
-            try (var ps = conn.prepareStatement(CREATE_TABLE_SQL)) {
-                ps.executeUpdate();
-            }
-        } catch (SQLException e) {
-            throw new DataAccessException("Failed to create user table: " + e.getMessage(), e);
+    private void initializeDatabase(){
+        try {
+            DatabaseManager.createDatabase();
+        } catch (DataAccessException exception) {
+            throw new RuntimeException("Failed to initialize database", exception);
+        }
+
+        try (var conn = DatabaseManager.getConnection()){
+             try (var stmt = conn.prepareStatement(CREATE_TABLE_SQL)) {
+                 stmt.executeUpdate();
+             }
+        }catch (SQLException | DataAccessException exception) {
+            throw new RuntimeException("Failed to create user table", exception);
         }
     }
 }

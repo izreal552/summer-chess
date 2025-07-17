@@ -91,15 +91,16 @@ public class SQLAuthDAO implements AuthDAO{
     private void initializeDatabase() {
         try {
             DatabaseManager.createDatabase();
-        } catch (DataAccessException e) {
-            throw new RuntimeException("Failed to create database", e);
+        } catch (DataAccessException exception) {
+            throw new RuntimeException("Failed to initialize database", exception);
         }
 
-        try (var conn = DatabaseManager.getConnection();
-             var stmt = conn.prepareStatement(CREATE_TABLE_SQL)) {
-            stmt.executeUpdate();
-        } catch (SQLException | DataAccessException e) {
-            throw new RuntimeException("Failed to create game table", e);
+        try (var conn = DatabaseManager.getConnection()){
+            try (var stmt = conn.prepareStatement(CREATE_TABLE_SQL)) {
+                stmt.executeUpdate();
+            }
+        }catch (SQLException | DataAccessException exception) {
+            throw new RuntimeException("Failed to create auth table", exception);
         }
     }
 }
