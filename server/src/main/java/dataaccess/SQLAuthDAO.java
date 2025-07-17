@@ -14,11 +14,16 @@ public class SQLAuthDAO implements AuthDAO{
 
     @Override
     public void addAuth(AuthData authData) throws DataAccessException {
+        addAuth(authData.authToken(), authData.username());
+    }
+
+    @Override
+    public void addAuth(String authToken, String username) throws DataAccessException {
         String stmt = "INSERT INTO auth (username, authToken) VALUES(?, ?)";
         try (var conn = DatabaseManager.getConnection()){
             try (var ps = conn.prepareStatement(stmt)){
-                ps.setString(1, authData.username());
-                ps.setString(2, authData.authToken());
+                ps.setString(1, username);
+                ps.setString(2, authToken);
                 ps.executeUpdate();
             }
         } catch (SQLException e) {
@@ -27,16 +32,23 @@ public class SQLAuthDAO implements AuthDAO{
             }
             throw new DataAccessException("Database connection failed: " + e.getMessage());
         }
-    }
-
-    @Override
-    public void addAuth(String authToken, String username) throws DataAccessException {
 
     }
 
     @Override
     public void delAuth(String authToken) throws DataAccessException {
-
+        String stmt = "DELETE FROM auth WHERE authToken = ?";
+        try (var conn = DatabaseManager.getConnection()) {
+            try (var ps = conn.prepareStatement(stmt)) {
+                ps.setString(1, authToken);
+                int rowsAffected = ps.executeUpdate();
+                if (rowsAffected == 0) {
+                    throw new DataAccessException("Auth token not found");
+                }
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException("Failed to delete auth: " + e.getMessage());
+        }
     }
 
     @Override
