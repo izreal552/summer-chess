@@ -3,8 +3,6 @@ package dataaccess;
 import model.UserData;
 import org.mindrot.jbcrypt.BCrypt;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 public class SQLUserDAO implements UserDAO {
@@ -63,7 +61,7 @@ public class SQLUserDAO implements UserDAO {
 
     @Override
     public void clear() {
-        var truncate = "TRUNCATE game";
+        var truncate = "TRUNCATE user";
         try (var conn = DatabaseManager.getConnection()) {
             try (var ps = conn.prepareStatement(truncate)) {
                 ps.executeUpdate();
