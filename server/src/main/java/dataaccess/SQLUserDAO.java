@@ -8,7 +8,7 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 public class SQLUserDAO implements UserDAO {
-    public SQLUserDAO() {
+    public SQLUserDAO() throws DataAccessException {
         initializeDatabase();
     }
 
@@ -21,8 +21,7 @@ public class SQLUserDAO implements UserDAO {
     public void createUser(String username, String password, String email) throws DataAccessException {
         String hashedPassword = BCrypt.hashpw(password, BCrypt.gensalt());
         String query = "INSERT INTO user (username, password, email) VALUES (?, ?, ?)";
-        try (var conn = DatabaseManager.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(query)) {
+        try (var conn = DatabaseManager.getConnection(); var stmt = conn.prepareStatement(query)) {
             stmt.setString(1, username);
             stmt.setString(2, hashedPassword);
             stmt.setString(3, email);
@@ -64,11 +63,13 @@ public class SQLUserDAO implements UserDAO {
 
     @Override
     public void clear() {
-        try (var conn = DatabaseManager.getConnection();
-             PreparedStatement stmt = conn.prepareStatement("TRUNCATE user")) {
-            stmt.executeUpdate();
-        } catch (SQLException | DataAccessException exception) {
-            throw new RuntimeException("Failed to clear user table", exception);
+        var truncate = "TRUNCATE game";
+        try (var conn = DatabaseManager.getConnection()) {
+            try (var ps = conn.prepareStatement(truncate)) {
+                ps.executeUpdate();
+            }
+        } catch (SQLException | DataAccessException e) {
+            throw new RuntimeException("Failed to clear user table", e);
         }
     }
 
@@ -81,18 +82,14 @@ public class SQLUserDAO implements UserDAO {
         )
     """;
 
-    private void initializeDatabase() {
-        try {
-            DatabaseManager.createDatabase();
-        } catch (DataAccessException exception) {
-            throw new RuntimeException("Failed to initialize database", exception);
-        }
-
-        try (var conn = DatabaseManager.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(CREATE_TABLE_SQL)) {
-            stmt.executeUpdate();
-        } catch (SQLException | DataAccessException exception) {
-            throw new RuntimeException("Failed to create user table", exception);
+    private void initializeDatabase() throws DataAccessException {
+        DatabaseManager.createDatabase();
+        try (var conn = DatabaseManager.getConnection()) {
+            try (var ps = conn.prepareStatement(CREATE_TABLE_SQL)) {
+                ps.executeUpdate();
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException("Failed to create user table: " + e.getMessage(), e);
         }
     }
 }
