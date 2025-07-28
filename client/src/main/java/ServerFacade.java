@@ -88,10 +88,15 @@ public class ServerFacade {
         }
     }
 
+    public boolean joinGame(int gameId, String playerColor) {
+        var path = "/game";
+        Map<String, Object> body = (playerColor != null)
+                ? Map.of("gameID", gameId, "playerColor", playerColor)
+                : Map.of("gameID", gameId);
 
-
-
-
+        Map<String, Object> response = makeRequest("PUT", path, body);
+        return !response.containsKey("Error");
+    }
 
     private Map<String, Object> makeRequest(String method, String path, Object request) {
         try {
