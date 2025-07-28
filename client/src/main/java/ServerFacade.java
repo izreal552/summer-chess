@@ -43,6 +43,17 @@ public class ServerFacade {
         return true;
     }
 
+    public boolean logout() {
+        var path = "/session";
+        Map<String, Object> response = makeRequest("DELETE", path, null);
+
+        if (response.containsKey("Error")) {
+            return false;
+        }
+        authToken = null;
+        return true;
+    }
+
 
 
 
