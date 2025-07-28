@@ -119,8 +119,6 @@ public class GameHandler {
         }
     }
 
-    // --- Helper methods & response wrappers ---
-
     private String errorResponse(String message) {
         return "{ \"message\": \"Error: %s\" }".formatted(message);
     }
@@ -144,8 +142,6 @@ public class GameHandler {
         String msg = e.getMessage() != null ? e.getMessage() : "internal server error";
         return errorResponse(msg);
     }
-
-    // --- DTO wrappers for cleaner JSON structure ---
 
     private record GamesResponse(HashSet<GameData> games) {}
     private record GameIdResponse(int gameID) {}

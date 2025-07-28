@@ -63,10 +63,31 @@ public class ServerFacade {
         if (response.containsKey("Error")) {
             return -1;
         }
-
         double gameID = (double) response.get("gameID");
         return (int) gameID;
     }
+
+    public HashSet<GameData> listGames() {
+        var path = "/game";
+        String rawResponse = makeRequestRaw("GET", path, null);
+
+        if (rawResponse.startsWith("Error")) {
+            return new HashSet<>();
+        }
+        try {
+            Map<String, Object> parsed = gson.fromJson(rawResponse, Map.class);
+            var gamesJson = gson.toJson(parsed.get("games"));
+            GameData[] gamesList = gson.fromJson(gamesJson, GameData[].class);
+            HashSet<GameData> gameSet = new HashSet<>();
+            for (GameData game : gamesList) {
+                gameSet.add(game);
+            }
+            return gameSet;
+        } catch (Exception e) {
+            return new HashSet<>();
+        }
+    }
+
 
 
 
