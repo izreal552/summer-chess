@@ -54,7 +54,19 @@ public class ServerFacade {
         return true;
     }
 
+    // Game Management
+    public int createGame(String gameName) {
+        var path = "/game";
+        var body = Map.of("gameName", gameName);
 
+        Map<String, Object> response = makeRequest("POST", path, body);
+        if (response.containsKey("Error")) {
+            return -1;
+        }
+
+        double gameID = (double) response.get("gameID");
+        return (int) gameID;
+    }
 
 
 
