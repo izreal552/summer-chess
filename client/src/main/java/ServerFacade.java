@@ -18,6 +18,24 @@ public class ServerFacade {
         this.serverUrl = "http://localhost:" + port;
     }
 
+    // user management
+    public boolean register(String username, String password, String email) {
+        var path = "/user";
+        var body = Map.of("username", username, "password", password, "email", email);
+
+        Map<String, Object> response = makeRequest("POST", path, body);
+        if (response.containsKey("Error")) {
+            return false;
+        }
+        authToken = (String) response.get("authToken");
+        return true;
+    }
+
+
+
+
+
+
 
     private Map<String, Object> makeRequest(String method, String path, Object request) {
         try {
