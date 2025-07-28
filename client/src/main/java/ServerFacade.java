@@ -31,6 +31,18 @@ public class ServerFacade {
         return true;
     }
 
+    public boolean login(String username, String password) {
+        var path = "/session";
+        var body = Map.of("username", username, "password", password);
+
+        Map<String, Object> response = makeRequest("POST", path, body);
+        if (response.containsKey("Error")) {
+            return false;
+        }
+        authToken = (String) response.get("authToken");
+        return true;
+    }
+
 
 
 
