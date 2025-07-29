@@ -35,9 +35,9 @@ public class ChessClient {
                 case "login" -> login(params);
                 case "register" -> register(params);
                 case "logout" -> logout();
-                case "create" -> createGame();
+                case "create" -> createGame(params);
                 case "list" -> listGames(params);
-                case "join" -> joinGame();
+                case "join" -> joinGame(params);
                 case "quit" -> "quit";
                 default -> help();
             };
@@ -46,16 +46,39 @@ public class ChessClient {
         }
     }
 
-    private String joinGame() {
+    private String joinGame(String[] params) {
         return null;
     }
 
-    private String listGames(String[] params) {
-        return null;
+    private String listGames(String[] params) throws Exception {
+        assertSignedIn();
+        games.clear();
+        Set<GameData> gameList = server.listGames();
+        games.addAll(gameList);
+
+        if (games.isEmpty()) {
+            return "No games currently available.";
+        }
+
+        StringBuilder sb = new StringBuilder("Available Games:\n");
+        for (int i = 0; i < games.size(); i++) {
+            GameData g = games.get(i);
+            String white = g.whiteUsername() != null ? g.whiteUsername() : "open";
+            String black = g.blackUsername() != null ? g.blackUsername() : "open";
+            sb.append("%d -- %s | White: %s | Black: %s\n".formatted(i, g.gameName(), white, black));
+        }
+        return sb.toString();
     }
 
-    private String createGame() {
-        return null;
+    private String createGame(String[] params) throws Exception {
+        assertSignedIn();
+        if (params.length != 1) {
+            System.out.println("Invalid Command");
+            return "create <NAME>";
+        }
+        int id = server.createGame(params[0]);
+        String output = id != -1 ? "Game '" + params[0] + "' created successfully." : "Failed to create game.";
+        return output;
     }
 
     private String logout() throws Exception {
