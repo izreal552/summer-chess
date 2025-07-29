@@ -62,7 +62,7 @@ public class ChessBoardPrinter {
 
         for (int col : plan.colOrder) {
             ChessPosition position = new ChessPosition(row, col);
-            boolean isDark = (row + col) % 2 != 0;
+            boolean isDark = (row + col) % 2 == 0;
             boolean isSelected = position.equals(selectedPos);
             boolean isTarget = possibleSquares.contains(position);
 
