@@ -5,9 +5,9 @@ import dataaccess.*;
 import model.AuthData;
 import model.GameData;
 
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Objects;
-import java.util.concurrent.ThreadLocalRandom;
 
 public class GameService {
     private final GameDAO gameDAO;
@@ -36,15 +36,23 @@ public class GameService {
     public int createGame(String authToken, String gameName) throws DataAccessException {
         authDAO.getAuth(authToken);
 
-        int gameID;
-        do {
-            gameID = ThreadLocalRandom.current().nextInt(1, 10000);
-        } while (gameDAO.gameExists(gameID));
+        // Get all existing games
+        Collection<GameData> allGames = gameDAO.listGames();
+
+        int maxId = 0;
+        for (GameData game : allGames) {
+            if (game.gameID() > maxId) {
+                maxId = game.gameID();
+            }
+        }
+
+        int gameID = maxId + 1;
 
         GameData newGame = new GameData(gameID, null, null, gameName, new ChessGame());
         gameDAO.createGame(newGame);
 
         return gameID;
+
     }
 
     public boolean joinGame(String authToken, int gameID, String color) throws DataAccessException {

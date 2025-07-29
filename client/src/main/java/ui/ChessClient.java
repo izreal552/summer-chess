@@ -12,6 +12,7 @@ public class ChessClient {
     private String currentUser;
     private final String serverUrl;
     private final ChessREPL chessREPL;
+    private final ChessBoardPrinter boardPrinter;
     private static ChessState ChessState = ui.ChessState.LOGGED_OUT;
     private final List<GameData> games = new ArrayList<>();
 
@@ -19,6 +20,7 @@ public class ChessClient {
         server = new ServerFacade(serverUrl);
         this.serverUrl = serverUrl;
         this.chessREPL = chessREPL;
+        this.boardPrinter = new ChessBoardPrinter(null);
     }
 
 
@@ -32,7 +34,7 @@ public class ChessClient {
                 case "register" -> register(params);
                 case "logout" -> logout();
                 case "create" -> createGame(params);
-                case "list" -> listGames(params);
+                case "list" -> listGames();
                 case "join" -> joinGame(params);
                 case "observe" -> observeGame(params);
                 case "quit" -> "quit";
@@ -62,8 +64,11 @@ public class ChessClient {
         }
 
         GameData game = games.get(index);
-        return "Observing game '" + game.gameName() + "':\n";
-//        + new BoardPrinter(game.game().getBoard(), ChessGame.TeamColor.WHITE).getBoardString();
+        System.out.println("Observing game '" + game.gameName() + "':\n");
+        boardPrinter.updateGame(game.game());
+        boardPrinter.printBoard(ChessGame.TeamColor.WHITE, null);
+        return "";
+
     }
 
     private String joinGame(String[] params) throws Exception {
@@ -92,16 +97,37 @@ public class ChessClient {
         GameData game = games.get(index);
         if (server.joinGame(game.gameID(), color)) {
             ChessGame.TeamColor teamColor = color.equals("WHITE") ? ChessGame.TeamColor.WHITE : ChessGame.TeamColor.BLACK;
+            boardPrinter.updateGame(game.game());
+            boardPrinter.printBoard(teamColor, null);
             return "Joined game '" + game.gameName() + "' as " + color + ".\n";
-//                    + new BoardPrinter(game.game().getBoard(), teamColor).getBoardString();
         }
         return "Failed to join game.";    }
 
-    private String listGames(String[] params) throws Exception {
+    private String listGames() throws Exception {
         assertSignedIn();
-        games.clear();
-        Set<GameData> gameList = server.listGames();
-        games.addAll(gameList);
+        Set<GameData> serverList = server.listGames();
+
+        for (GameData serverGame : serverList) {
+            boolean found = false;
+
+            for (int i = 0; i < games.size(); i++) {
+                GameData localGame = games.get(i);
+
+                if (localGame.gameID() == serverGame.gameID()) {
+                    if (!Objects.equals(localGame.whiteUsername(), serverGame.whiteUsername()) ||
+                            !Objects.equals(localGame.blackUsername(), serverGame.blackUsername())) {
+                        games.set(i, serverGame);
+                    }
+                    found = true;
+                    break;
+                }
+            }
+
+            if (!found) {
+                games.add(serverGame); // Add new game to preserve order
+            }
+        }
+
 
         if (games.isEmpty()) {
             return "No games currently available.";
@@ -123,9 +149,23 @@ public class ChessClient {
             System.out.println("Invalid Command");
             return "create <NAME>";
         }
-        int id = server.createGame(params[0]);
-        String output = id != -1 ? "Game '" + params[0] + "' created successfully." : "Failed to create game.";
-        return output;
+        String gameName = params[0];
+        int id = server.createGame(gameName);
+
+        if (id == -1) {
+            return "Failed to create game.";
+        }
+
+        // Fetch the complete game list and find the newly created game by ID
+        Set<GameData> gameList = server.listGames();
+        for (GameData g : gameList) {
+            if (g.gameID() == id) {
+                games.add(g);  // Append to preserve order
+                return "Game '" + gameName + "' created successfully.";
+            }
+        }
+
+        return "Game created but not found in game list.";
     }
 
     private String logout() throws Exception {
