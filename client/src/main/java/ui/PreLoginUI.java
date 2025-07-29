@@ -34,25 +34,32 @@ public class PreLoginUI {
                     return;
                 case "help":
                     preHelp();
+                    break;
                 case "login":
                     if(input.length != 3){
                         System.out.println("Invalid login command");
                         preHelp();
+                        break;
                     } else if(server.login(input[1], input[2])){
-                        System.out.println("Logged in as" + input[1]);
+                        System.out.println("Logged in as " + input[1]);
                         login = true;
+                        break;
                     } else{
                         System.out.println("Incorrect Username/Password");
+                        break;
                     }
                 case "register":
                     if(input.length != 4){
                         System.out.println("Invalid register command");
                         preHelp();
+                        break;
                     } else if(server.register(input[1], input[2], input[3])){
-                        System.out.println("Registered and logged in as" + input[1]);
+                        System.out.println("Registered and logged in as " + input[1]);
                         login = true;
+                        break;
                     } else{
                         System.out.println("Username already taken");
+                        break;
                     }
                 default:
                     System.out.println("Invalid command");
