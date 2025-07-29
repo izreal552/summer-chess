@@ -34,6 +34,7 @@ public class ChessREPL {
     }
 
     private void printPrompt() {
-        System.out.print("\n" + RESET_TEXT_COLOR + "[LOGGED_OUT]" + " >>> " + SET_TEXT_COLOR_GREEN);
+        String stateLabel = (ui.ChessClient.getState() == ChessState.LOGGED_IN) ? "[LOGGED_IN]" : "[LOGGED_OUT]";
+        System.out.print("\n" + RESET_TEXT_COLOR + stateLabel + " >>> " + SET_TEXT_COLOR_GREEN);
     }
 }

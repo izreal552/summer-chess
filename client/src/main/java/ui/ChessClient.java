@@ -11,7 +11,7 @@ public class ChessClient {
     private String currentUser;
     private final String serverUrl;
     private final ChessREPL chessREPL;
-    private ChessState ChessState = ui.ChessState.LOGGED_OUT;
+    private static ChessState ChessState = ui.ChessState.LOGGED_OUT;
     private final List<GameData> games = new ArrayList<>();
 
 
@@ -20,6 +20,10 @@ public class ChessClient {
         server = new ServerFacade(serverUrl);
         this.serverUrl = serverUrl;
         this.chessREPL = chessREPL;
+    }
+
+    public static ChessState getState() {
+        return ChessState;
     }
 
     public String eval(String input) {
@@ -63,10 +67,19 @@ public class ChessClient {
     }
 
     private String register(String[] params) {
-    return null;
+        if (params.length != 3) {
+            System.out.println("Invalid Command");
+            return "register <USERNAME> <PASSWORD> <EMAIL>";
+        }
+        if (server.register(params[0], params[1], params[2])) {
+            ChessState = ui.ChessState.LOGGED_IN;
+            currentUser = params[0];
+            return "Registered and logged in as " + currentUser;
+        }
+        return "Registration failed. Username may already be taken.";
     }
 
-    private String login(String[] params) throws Exception{
+    private String login(String[] params){
         if (params.length != 2) {
             System.out.println("Invalid Command");
             return "login <USERNAME> <PASSWORD>";
