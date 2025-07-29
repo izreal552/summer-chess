@@ -1,12 +1,15 @@
 import chess.*;
+import ui.ChessREPL;
 import ui.PreLoginUI;
 import ui.ServerFacade;
 
 public class Main {
     public static void main(String[] args) {
-        ServerFacade serverFacade = new ServerFacade();
-        PreLoginUI preLoginUI = new PreLoginUI(serverFacade);
-        preLoginUI.run();
-        System.out.println("Program successfully closed");
+        var serverUrl = "http://localhost:8080";
+        if (args.length == 1) {
+            serverUrl = args[0];
+        }
+        System.out.println("Welcome to 240 Chess");
+        new ChessREPL(serverUrl).run();
     }
 }

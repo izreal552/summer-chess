@@ -16,8 +16,8 @@ public class ServerFacade {
     private String authToken;
     private final Gson gson = new Gson();
 
-    public void setServerPort(int port) {
-        this.serverUrl = "http://localhost:" + port;
+    public ServerFacade(String serverUrl) {
+        this.serverUrl = serverUrl;
     }
 
     // user management
