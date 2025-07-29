@@ -20,7 +20,7 @@ public class PreLoginUI {
         boolean login = false;
 
         while(!login){
-            printPrompt("[LOGGED_OUT]");
+            printPrompt();
             String[] input = scanner.nextLine().trim().split(" ");
 
             if (input.length == 0 || input[0].isBlank()) {
@@ -34,14 +34,38 @@ public class PreLoginUI {
                     return;
                 case "help":
                     preHelp();
+                case "login":
+                    if(input.length != 3){
+                        System.out.println("Invalid login command");
+                        preHelp();
+                    } else if(server.login(input[1], input[2])){
+                        System.out.println("Logged in as" + input[1]);
+                        login = true;
+                    } else{
+                        System.out.println("Incorrect Username/Password");
+                    }
+                case "register":
+                    if(input.length != 4){
+                        System.out.println("Invalid register command");
+                        preHelp();
+                    } else if(server.register(input[1], input[2], input[3])){
+                        System.out.println("Registered and logged in as" + input[1]);
+                        login = true;
+                    } else{
+                        System.out.println("Username already taken");
+                    }
+                default:
+                    System.out.println("Invalid command");
+                    preHelp();
+                    break;
             }
         }
 
 
     }
 
-    private void printPrompt(String statement) {
-        System.out.print("\n" + RESET_TEXT_COLOR + statement + " >>> " + SET_TEXT_COLOR_GREEN);
+    private void printPrompt() {
+        System.out.print("\n" + RESET_TEXT_COLOR + "[LOGGED_OUT]" + " >>> " + SET_TEXT_COLOR_GREEN);
     }
 
     private void preHelp() {
