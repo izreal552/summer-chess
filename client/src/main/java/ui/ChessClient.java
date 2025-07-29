@@ -43,8 +43,27 @@ public class ChessClient {
         }
     }
 
-    private String observeGame(String[] params) {
-        return null;
+    private String observeGame(String[] params) throws Exception {
+        assertSignedIn();
+        if (params.length != 1) {
+            System.out.println("Invalid Command");
+            return "Usage: observe <INDEX>";
+        }
+
+        int index;
+        try {
+            index = Integer.parseInt(params[0]);
+        } catch (Exception e) {
+            return "Invalid index: must be a number.";
+        }
+
+        if (index < 0 || index >= games.size()) {
+            return "Invalid game index.";
+        }
+
+        GameData game = games.get(index);
+        return "Observing game '" + game.gameName() + "':\n";
+//        + new BoardPrinter(game.game().getBoard(), ChessGame.TeamColor.WHITE).getBoardString();
     }
 
     private String joinGame(String[] params) throws Exception {
