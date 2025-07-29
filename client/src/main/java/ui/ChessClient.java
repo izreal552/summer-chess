@@ -8,10 +8,10 @@ import java.util.*;
 
 public class ChessClient {
     ServerFacade server;
-    private String username;
+    private String currentUser;
     private final String serverUrl;
     private final ChessREPL chessREPL;
-    private final ChessState ChessState = ui.ChessState.LOGGED_OUT;
+    private ChessState ChessState = ui.ChessState.LOGGED_OUT;
     private final List<GameData> games = new ArrayList<>();
 
 
@@ -54,8 +54,12 @@ public class ChessClient {
         return null;
     }
 
-    private String logout() {
-        return null;
+    private String logout() throws Exception {
+        assertSignedIn();
+        server.logout();
+        currentUser = null;
+        ChessState = ui.ChessState.LOGGED_OUT;
+        return ("logged out");
     }
 
     private String register(String[] params) {
@@ -63,7 +67,6 @@ public class ChessClient {
     }
 
     private String login(String[] params) throws Exception{
-
         return null;
     }
 
