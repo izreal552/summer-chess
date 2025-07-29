@@ -1,6 +1,7 @@
 package ui;
 
 
+import chess.ChessGame;
 import model.GameData;
 
 import java.util.*;
@@ -14,17 +15,12 @@ public class ChessClient {
     private static ChessState ChessState = ui.ChessState.LOGGED_OUT;
     private final List<GameData> games = new ArrayList<>();
 
-
-
     public ChessClient(String serverUrl, ChessREPL chessREPL){
         server = new ServerFacade(serverUrl);
         this.serverUrl = serverUrl;
         this.chessREPL = chessREPL;
     }
 
-    public static ChessState getState() {
-        return ChessState;
-    }
 
     public String eval(String input) {
         try {
@@ -38,6 +34,7 @@ public class ChessClient {
                 case "create" -> createGame(params);
                 case "list" -> listGames(params);
                 case "join" -> joinGame(params);
+                case "observe" -> observeGame(params);
                 case "quit" -> "quit";
                 default -> help();
             };
@@ -46,9 +43,40 @@ public class ChessClient {
         }
     }
 
-    private String joinGame(String[] params) {
+    private String observeGame(String[] params) {
         return null;
     }
+
+    private String joinGame(String[] params) throws Exception {
+        assertSignedIn();
+        if (params.length != 2) {
+            System.out.println("Invalid Command");
+            return "join <INDEX> [WHITE|BLACK]";
+        }
+
+        int index;
+        try {
+            index = Integer.parseInt(params[0]);
+        } catch (Exception e) {
+            return "Invalid index: must be a number.";
+        }
+
+        if (index < 0 || index >= games.size()) {
+            return "Invalid game index.";
+        }
+
+        String color = params[1].toUpperCase();
+        if (!color.equals("WHITE") && !color.equals("BLACK")) {
+            return "Color must be WHITE or BLACK.";
+        }
+
+        GameData game = games.get(index);
+        if (server.joinGame(game.gameID(), color)) {
+            ChessGame.TeamColor teamColor = color.equals("WHITE") ? ChessGame.TeamColor.WHITE : ChessGame.TeamColor.BLACK;
+            return "Joined game '" + game.gameName() + "' as " + color + ".\n";
+//                    + new BoardPrinter(game.game().getBoard(), teamColor).getBoardString();
+        }
+        return "Failed to join game.";    }
 
     private String listGames(String[] params) throws Exception {
         assertSignedIn();
@@ -141,5 +169,9 @@ public class ChessClient {
             throw new Exception("Error: You must sign in");
         }
     }
-    
+
+    public static ChessState getState() {
+        return ChessState;
+    }
+
 }
