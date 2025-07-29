@@ -1,5 +1,6 @@
 package ui;
 
+import chess.ChessGame;
 import model.GameData;
 
 import java.util.*;
@@ -55,18 +56,25 @@ public class PostLoginUI {
                     if(input.length != 3){
                         System.out.println("Invalid Command");
                         System.out.println("join <ID> [WHITE|BLACK] - a game");
+                        break;
                     }
-                    int index;
                     try {
-                        index = Integer.parseInt(input[1]);
+                        refreshGames();
+                        int index = Integer.parseInt(input[1]);
+                        GameData game = games.get(index);
+                        if(server.joinGame(game.gameID(), input[2])){
+                            ChessGame.TeamColor color = input[2].equalsIgnoreCase("WHITE") ?
+                                    ChessGame.TeamColor.WHITE : ChessGame.TeamColor.BLACK;
+                            System.out.printf("Joined game: %d as %s", game.gameID(), color);
+                        }else {
+                            System.out.println("Unable to join");
+                        }
                     } catch (Exception e) {
                         System.out.println("Invalid game index: not a valid number.");
                         System.out.println("Note: Use the LIST_ID (first column) not the gameID");
                         listGames();
-                        continue;
                     }
-
-
+                    break;
                 case "observe":
                 default:
                     System.out.println("Invalid command");
