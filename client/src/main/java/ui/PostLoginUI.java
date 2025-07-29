@@ -2,19 +2,17 @@ package ui;
 
 import model.GameData;
 
-import java.util.HashSet;
-import java.util.Scanner;
+import java.util.*;
 
-import static ui.EscapeSequences.RESET_TEXT_COLOR;
-import static ui.EscapeSequences.SET_TEXT_COLOR_GREEN;
+import static ui.EscapeSequences.*;
 
 public class PostLoginUI {
     ServerFacade server;
-    HashSet<GameData> games;
+    List<GameData> games;
 
     public PostLoginUI(ServerFacade server){
         this.server = server;
-        games = new HashSet<>();
+        this.games = new ArrayList<>();
     }
 
 
@@ -24,6 +22,7 @@ public class PostLoginUI {
         Scanner scanner = new Scanner(System.in);
 
         while(login){
+            printPrompt();
             String[] input = scanner.nextLine().trim().split(" ");
             if (input.length == 0 || input[0].isBlank()) {
                 System.out.println("No command entered.");
@@ -36,6 +35,39 @@ public class PostLoginUI {
                 case "help":
                     postHelp();
                     break;
+                case "logout":
+                    server.logout();
+                    login = false;
+                    break;
+                case "list":
+                    refreshGames();
+                    listGames();
+                case "create":
+                    if (input.length != 2) {
+                        System.out.println("Invalid Command");
+                        System.out.println("create <NAME> - a game");
+                    } else {
+                        server.createGame(input[1]);
+                        System.out.println("Created game " + input[1]);
+                    }
+                    break;
+                case "join":
+                    if(input.length != 3){
+                        System.out.println("Invalid Command");
+                        System.out.println("join <ID> [WHITE|BLACK] - a game");
+                    }
+                    int index;
+                    try {
+                        index = Integer.parseInt(input[1]);
+                    } catch (Exception e) {
+                        System.out.println("Invalid game index: not a valid number.");
+                        System.out.println("Note: Use the LIST_ID (first column) not the gameID");
+                        listGames();
+                        continue;
+                    }
+
+
+                case "observe":
                 default:
                     System.out.println("Invalid command");
                     postHelp();
@@ -65,5 +97,22 @@ public class PostLoginUI {
             """);
     }
 
+    private void refreshGames() {
+        games.clear();
+        HashSet<GameData> set = server.listGames();
+        games.addAll(set);
+        if (games.isEmpty()) {
+            System.out.println("There are currently no games.");
+        }
+    }
+
+    private void listGames() {
+        for (int index = 0; index < games.size(); index++) {
+            GameData g = games.get(index);
+            String white = g.whiteUsername() != null ? g.whiteUsername() : "open";
+            String black = g.blackUsername() != null ? g.blackUsername() : "open";
+            System.out.printf("ID: %d -- Game: %s | White: %s | Black: %s%n", index, g.gameName(), white, black);
+        }
+    }
 
 }
