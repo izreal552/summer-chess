@@ -67,7 +67,16 @@ public class ChessClient {
     }
 
     private String login(String[] params) throws Exception{
-        return null;
+        if (params.length != 2) {
+            System.out.println("Invalid Command");
+            return "login <USERNAME> <PASSWORD>";
+        }
+        if (server.login(params[0], params[1])) {
+            ChessState = ui.ChessState.LOGGED_IN;
+            currentUser = params[0];
+            return "Logged in as: " + currentUser;
+        }
+        return "Login failed. Check your username or password.";
     }
 
 
