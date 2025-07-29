@@ -13,7 +13,7 @@ public class ChessClient {
     private final String serverUrl;
     private final ChessREPL chessREPL;
     private final ChessBoardPrinter boardPrinter;
-    private static ChessState ChessState = ui.ChessState.LOGGED_OUT;
+    private static ChessState chessState = ui.ChessState.LOGGED_OUT;
     private final List<GameData> games = new ArrayList<>();
 
     public ChessClient(String serverUrl, ChessREPL chessREPL){
@@ -171,7 +171,7 @@ public class ChessClient {
         assertSignedIn();
         server.logout();
         currentUser = null;
-        ChessState = ui.ChessState.LOGGED_OUT;
+        chessState = ui.ChessState.LOGGED_OUT;
         return ("logged out");
     }
 
@@ -181,7 +181,7 @@ public class ChessClient {
             return "register <USERNAME> <PASSWORD> <EMAIL>";
         }
         if (server.register(params[0], params[1], params[2])) {
-            ChessState = ui.ChessState.LOGGED_IN;
+            chessState = ui.ChessState.LOGGED_IN;
             currentUser = params[0];
             return "Registered and logged in as " + currentUser;
         }
@@ -194,7 +194,7 @@ public class ChessClient {
             return "login <USERNAME> <PASSWORD>";
         }
         if (server.login(params[0], params[1])) {
-            ChessState = ui.ChessState.LOGGED_IN;
+            chessState = ui.ChessState.LOGGED_IN;
             currentUser = params[0];
             return "Logged in as: " + currentUser;
         }
@@ -203,7 +203,7 @@ public class ChessClient {
 
 
     public String help() {
-        if (ChessState == ui.ChessState.LOGGED_OUT) {
+        if (chessState == ui.ChessState.LOGGED_OUT) {
             return """
                     - register <USERNAME> <PASSWORD> <EMAIL> - Create a new account
                     - login <USERNAME> <PASSWORD> - Login to your account
@@ -223,13 +223,13 @@ public class ChessClient {
     }
 
     private void assertSignedIn() throws Exception {
-        if (ChessState == ui.ChessState.LOGGED_OUT) {
+        if (chessState == ui.ChessState.LOGGED_OUT) {
             throw new Exception("Error: You must sign in");
         }
     }
 
     public static ChessState getState() {
-        return ChessState;
+        return chessState;
     }
 
 }

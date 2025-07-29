@@ -105,7 +105,7 @@ public class ServerFacadeTests {
 
     @Test
     @Order(8)
-    @DisplayName("Create Game Failure (Unauthenticated)")
+    @DisplayName("Create Game Failure")
     public void createGameFailure() {
         int id = serverFacade.createGame("gameName");
         assertEquals(-1, id);
@@ -123,7 +123,7 @@ public class ServerFacadeTests {
 
     @Test
     @Order(10)
-    @DisplayName("List Games Failure (Unauthenticated)")
+    @DisplayName("List Games Failure")
     public void listGamesFailure() {
         var games = serverFacade.listGames();
         assertTrue(games == null || games.isEmpty());
@@ -141,7 +141,7 @@ public class ServerFacadeTests {
 
     @Test
     @Order(12)
-    @DisplayName("Join Game Failure (Duplicate Color)")
+    @DisplayName("Join Game Failure")
     public void joinGameFailure() {
         serverFacade.register("user", "pass", "email");
         int id = serverFacade.createGame("gameName");

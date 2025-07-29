@@ -5,16 +5,16 @@ import java.util.Scanner;
 import static ui.EscapeSequences.*;
 
 public class ChessREPL {
-    private final ChessClient ChessClient;
+    private final ChessClient chessClient;
 
     public ChessREPL(String serverUrl) {
-        ChessClient = new ChessClient(serverUrl, this);
+        chessClient = new ChessClient(serverUrl, this);
 
     }
 
     public void run() {
         System.out.println("♞ Welcome to Chess!");
-        System.out.print(ChessClient.help());
+        System.out.print(chessClient.help());
 
         Scanner scanner = new Scanner(System.in);
         var result = "";
@@ -23,7 +23,7 @@ public class ChessREPL {
             String line = scanner.nextLine();
 
             try {
-                result = ChessClient.eval(line);
+                result = chessClient.eval(line);
                 System.out.print(SET_TEXT_COLOR_BLUE + result);
             } catch (Throwable e) {
                 var msg = e.toString();
