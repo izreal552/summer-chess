@@ -156,11 +156,10 @@ public class ChessClient {
             return "Failed to create game.";
         }
 
-        // Fetch the complete game list and find the newly created game by ID
         Set<GameData> gameList = server.listGames();
         for (GameData g : gameList) {
             if (g.gameID() == id) {
-                games.add(g);  // Append to preserve order
+                games.add(g);
                 return "Game '" + gameName + "' created successfully.";
             }
         }
