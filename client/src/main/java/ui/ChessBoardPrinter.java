@@ -21,7 +21,7 @@ public class ChessBoardPrinter {
 
     public void printBoard(ChessGame.TeamColor color, ChessPosition selectedPos) {
         boolean isBlackView = (color == ChessGame.TeamColor.BLACK);
-        BoardRenderPlan renderPlan = new BoardRenderPlan(isBlackView);
+        BoardLayout layout = new BoardLayout(isBlackView);
 
         StringBuilder output = new StringBuilder();
         output.append(SET_TEXT_BOLD);
@@ -34,33 +34,33 @@ public class ChessBoardPrinter {
             }
         }
 
-        printColumnLabels(renderPlan, output);
+        printColLabels(layout, output);
 
-        for (int row : renderPlan.rowOrder) {
-            printRow(row, renderPlan, selectedPos, possibleSquares, output);
+        for (int row : layout.rowOrder) {
+            printRow(row, layout, selectedPos, possibleSquares, output);
         }
 
-        printColumnLabels(renderPlan, output);
+        printColLabels(layout, output);
         output.append(RESET_TEXT_BOLD_FAINT);
 
         out.println(output);
         out.printf("Turn: %s\n", game.getTeamTurn().toString());
     }
 
-    private void printColumnLabels(BoardRenderPlan plan, StringBuilder output) {
+    private void printColLabels(BoardLayout boardlayout, StringBuilder output) {
         output.append(SET_BG_COLOR_BLACK).append(SET_TEXT_COLOR_BLUE).append("   ");
-        for (String col : plan.colLabels) {
+        for (String col : boardlayout.colLabels) {
             output.append(" ").append(col).append(" ");
         }
         output.append("   ").append(RESET_BG_COLOR).append(RESET_TEXT_COLOR).append("\n");
     }
 
-    private void printRow(int row, BoardRenderPlan plan, ChessPosition selectedPos,
+    private void printRow(int row, BoardLayout boardlayout, ChessPosition selectedPos,
                           HashSet<ChessPosition> possibleSquares, StringBuilder output) {
         output.append(SET_BG_COLOR_BLACK).append(SET_TEXT_COLOR_BLUE);
         output.append(" ").append(row).append(" ");
 
-        for (int col : plan.colOrder) {
+        for (int col : boardlayout.colOrder) {
             ChessPosition position = new ChessPosition(row, col);
             boolean isDark = (row + col) % 2 != 0;
             boolean isSelected = position.equals(selectedPos);
@@ -75,8 +75,6 @@ public class ChessBoardPrinter {
 
     private String formatSquare(ChessPosition pos, boolean isDark, boolean isSelected, boolean isTarget) {
         StringBuilder sb = new StringBuilder();
-
-        // Highlighting logic
         if (isSelected) {
             sb.append(SET_BG_COLOR_YELLOW);
         } else if (isTarget) {
@@ -107,13 +105,12 @@ public class ChessBoardPrinter {
         };
     }
 
-    // --- Helper class for board orientation ---
-    private static class BoardRenderPlan {
+    private static class BoardLayout {
         final int[] rowOrder;
         final int[] colOrder;
         final String[] colLabels;
 
-        BoardRenderPlan(boolean isBlackView) {
+        BoardLayout(boolean isBlackView) {
             rowOrder = isBlackView ? new int[]{1, 2, 3, 4, 5, 6, 7, 8} : new int[]{8, 7, 6, 5, 4, 3, 2, 1};
             colOrder = isBlackView ? new int[]{8, 7, 6, 5, 4, 3, 2, 1} : new int[]{1, 2, 3, 4, 5, 6, 7, 8};
             colLabels = isBlackView ? new String[]{"h", "g", "f", "e", "d", "c", "b", "a"}
